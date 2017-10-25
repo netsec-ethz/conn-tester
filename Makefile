@@ -1,4 +1,4 @@
-.PHONY: all clean test coverage lint deps_proto deps depspurge proto bin libs hsr
+.PHONY: all clean lint deps depspurge bin libs
 
 SHELL=/bin/bash
 LOCAL_DIRS = $(shell find * -maxdepth 0 -type d | grep -v '^vendor$$\|^bin$$')
