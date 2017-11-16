@@ -7,7 +7,7 @@
             }
         },
         {
-            "name":"tcp_out",
+            "name":"tcp_outa",
             "params":{
                 "host":"github.com",
                 "port":"443",

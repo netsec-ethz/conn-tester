@@ -15,7 +15,6 @@ func (tf *TestFactory) AddTest(testName string, initializer InitFunc) {
 }
 
 func (tf *TestFactory) CreateTest(testName string, params *json.RawMessage) Test {
-	// TODO: Add error handling
 	if init, exists := tf.generators[testName]; exists {
 		return init(params)
 	}

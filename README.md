@@ -18,11 +18,20 @@ Executables will be placed in `./bin` directory.
 
 ### Server application
 
-`./bin/server <http_listen_port>` 
+```
+./bin/server <http_listen_port>
+```
 
 ### Client application
 
-`./bin/client <test_configuration_file.json>`
+```
+./bin/client --config <test_configuration_file.json>
+```
+
+To save test results in json file, run following
+```
+./bin/client --config <test_configuration_file.json> --output_result --output_path=<output_result.json>
+```
 
 #### Client configuration file example
 
