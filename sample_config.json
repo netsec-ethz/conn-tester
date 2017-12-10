@@ -8,12 +8,14 @@
         },
         {
             "name":"tcp_outa",
+            "unique_id":"Hello",
             "params":{
                 "host":"github.com",
                 "port":"443",
                 "request":"hello",
                 "compare_response":false,
-                "timeout":5
+                "timeout":5,
+                "milan":true
             }
         },
         {
@@ -48,7 +50,7 @@
             "params":{
                 "host":"http://localhost:8080/udp-test",
                 "timeout":5,
-                "my_port":"50000"
+                "my_port":"[50000-50010]"
             }
         }
     ]

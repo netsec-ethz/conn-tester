@@ -20,10 +20,10 @@ type Test interface {
 }
 
 type TestConfiguration struct {
-	Name   string           `json:"name"`
-	Params *json.RawMessage `json:"params"`
-	test   Test
-	Result *TestResult `json:"result"`
+	Name    string           `json:"name"`
+	Params  *json.RawMessage `json:"params"`
+	Tests   []Test           `json:"tests"`
+	Results []*TestResult    `json:"results"`
 }
 
 type TestConfigurationList struct {
@@ -46,10 +46,11 @@ func LoadTests(testFactory *TestFactory, configFilePath string) (*TestConfigurat
 
 	for _, testConfig := range configuration.TestList {
 
-		testConfig.test = testFactory.CreateTest(testConfig.Name, testConfig.Params)
+		testConfig.Tests = testFactory.CreateTests(testConfig.Name, testConfig.Params)
+		testConfig.Results = make([]*TestResult, 0, cap(testConfig.Tests))
 
-		if testConfig.test == nil {
-			fmt.Printf("Unknown test <%s> \n", testConfig.Name)
+		if len(testConfig.Tests) == 0 {
+			fmt.Printf("Unknown name <%s>, test won't be created!\n", testConfig.Name)
 		}
 	}
 
@@ -57,24 +58,31 @@ func LoadTests(testFactory *TestFactory, configFilePath string) (*TestConfigurat
 }
 
 func RunTest(tConfig *TestConfiguration) {
-	if tConfig.test == nil {
-		tConfig.Result = &TestResult{Success: false, Message: "Not a valid test"}
+	if len(tConfig.Tests) == 0 {
 		color.Yellow("Skipping %s as it is not properly initialized\n\n", tConfig.Name)
 		return
 	}
 
-	response := make(chan *TestResult, 1)
+	done := make(chan bool, 1)
 
 	go func() {
-		fmt.Printf("Running: %s \n(%s)\n", tConfig.test.GetTestName(), tConfig.test.GetTestDescription())
-		tConfig.Result = tConfig.test.Run()
-		response <- tConfig.Result
+		for _, test := range tConfig.Tests {
+			fmt.Printf("Running: %s \n(%s)\n", test.GetTestName(), test.GetTestDescription())
+			result := test.Run()
+
+			if result.Success {
+				color.Green("SUCCESS! \n\n")
+			} else {
+				color.Yellow("FAIL! details: %s\n\n", result.Message)
+			}
+
+			tConfig.Results = append(tConfig.Results, result)
+		}
+
+		done <- true
 	}()
 
-	result := <-response
-	if result.Success {
-		color.Green("SUCCESS! \n\n")
-	} else {
-		color.Yellow("FAIL! details: %s\n\n", result.Message)
-	}
+	<-done
+
+	fmt.Printf("Finished running [%s] \n", tConfig.Name)
 }

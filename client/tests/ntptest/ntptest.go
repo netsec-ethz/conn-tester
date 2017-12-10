@@ -35,8 +35,7 @@ func (ntpt *NtpTest) Run() *tests.TestResult {
 	return &testRes
 }
 
-func Create(params *json.RawMessage) tests.Test {
-	var testInterface tests.Test
+func Create(params *json.RawMessage) []tests.Test {
 	var ntp NtpTest
 
 	err := json.Unmarshal(*params, &ntp)
@@ -45,7 +44,5 @@ func Create(params *json.RawMessage) tests.Test {
 		// TODO: Handle error
 	}
 
-	testInterface = &ntp
-
-	return testInterface
+	return []tests.Test{&ntp}
 }

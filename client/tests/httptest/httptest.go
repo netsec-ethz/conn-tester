@@ -48,8 +48,7 @@ func (h *HttpTest) Run() *tests.TestResult {
 	}
 }
 
-func Create(params *json.RawMessage) tests.Test {
-	var testInterface tests.Test
+func Create(params *json.RawMessage) []tests.Test {
 	var h HttpTest
 
 	err := json.Unmarshal(*params, &h)
@@ -58,7 +57,5 @@ func Create(params *json.RawMessage) tests.Test {
 		// TODO: Handle error
 	}
 
-	testInterface = &h
-
-	return testInterface
+	return []tests.Test{&h}
 }

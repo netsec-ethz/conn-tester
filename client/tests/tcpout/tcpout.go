@@ -54,8 +54,7 @@ func (t *TCPOutTest) Run() *tests.TestResult {
 	}
 }
 
-func Create(params *json.RawMessage) tests.Test {
-	var testInterface tests.Test
+func Create(params *json.RawMessage) []tests.Test {
 	var t TCPOutTest
 
 	err := json.Unmarshal(*params, &t)
@@ -64,7 +63,5 @@ func Create(params *json.RawMessage) tests.Test {
 		// TODO: Handle error
 	}
 
-	testInterface = &t
-
-	return testInterface
+	return []tests.Test{&t}
 }

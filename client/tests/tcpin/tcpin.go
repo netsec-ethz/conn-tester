@@ -69,8 +69,7 @@ func (t *TCPInTest) Run() *tests.TestResult {
 	return &tests.TestResult{Success: success}
 }
 
-func Create(params *json.RawMessage) tests.Test {
-	var testInterface tests.Test
+func Create(params *json.RawMessage) []tests.Test {
 	var t TCPInTest
 
 	err := json.Unmarshal(*params, &t)
@@ -79,7 +78,5 @@ func Create(params *json.RawMessage) tests.Test {
 		// TODO: Handle error
 	}
 
-	testInterface = &t
-
-	return testInterface
+	return []tests.Test{&t}
 }

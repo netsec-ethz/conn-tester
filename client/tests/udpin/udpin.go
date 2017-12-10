@@ -3,6 +3,8 @@ package udpin
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/netsec-ethz/conn-tester/client/tests"
@@ -17,6 +19,8 @@ type UDPInTest struct {
 	MyPort  string        `json:"my_port"`
 	Timeout time.Duration `json:"timeout"`
 }
+
+const port_range_regex = "\\[(\\d+)\\-(\\d+)\\]"
 
 func (t *UDPInTest) GetTestName() string {
 	return "UDP in reachability test"
@@ -59,8 +63,7 @@ func (t *UDPInTest) Run() *tests.TestResult {
 	return &tests.TestResult{Success: success}
 }
 
-func Create(params *json.RawMessage) tests.Test {
-	var testInterface tests.Test
+func Create(params *json.RawMessage) []tests.Test {
 	var t UDPInTest
 
 	err := json.Unmarshal(*params, &t)
@@ -69,7 +72,32 @@ func Create(params *json.RawMessage) tests.Test {
 		// TODO: Handle error
 	}
 
-	testInterface = &t
+	// We need to check if port range is specified and create more instances
+	re := regexp.MustCompile(port_range_regex)
+	port_range := re.FindAllStringSubmatch(t.MyPort, 1)
 
-	return testInterface
+	var startPort = 0
+	var endPort = 0
+
+	if len(port_range) == 1 {
+		// Port range has been specified
+		fmt.Printf("Received port range from %s to %s \n", port_range[0][1], port_range[0][2])
+		startPort, _ = strconv.Atoi(port_range[0][1])
+		endPort, _ = strconv.Atoi(port_range[0][2])
+
+	} else {
+		startPort, _ = strconv.Atoi(t.MyPort)
+		endPort, _ = strconv.Atoi(t.MyPort)
+	}
+
+	var totalPorts = endPort - startPort + 1
+
+	var generatedTests = make([]tests.Test, 0, totalPorts)
+	for i := startPort; i <= endPort; i++ {
+		newTest := t
+		newTest.MyPort = strconv.Itoa(i)
+		generatedTests = append(generatedTests, &newTest)
+	}
+
+	return generatedTests
 }
